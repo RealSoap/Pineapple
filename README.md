@@ -7,4 +7,4 @@
 <ul>
 <li>RADIUS Breaking with Pineapple Tetra by Eric “Soap“ Parks; Original concept “Pineapple Corporate Toolkit” by Matt Burch</li>
 <li>MANA Tool Kit with working SSLstrip</li></ul>
-<h3>And others as the porject grows.</h3>
+<h3>And others as the project grows.</h3>
