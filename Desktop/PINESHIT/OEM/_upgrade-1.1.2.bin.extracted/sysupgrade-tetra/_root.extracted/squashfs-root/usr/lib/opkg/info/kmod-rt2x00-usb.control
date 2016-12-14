@@ -1,0 +1,9 @@
+Package: kmod-rt2x00-usb
+Version: 3.18.36+2016-01-10-1
+Depends: kernel (=3.18.36-1-871fa9a3e0f1cc470d440bd876b3c8aa), kmod-rt2x00-lib, kmod-usb-core
+Source: package/kernel/mac80211
+Section: kernel
+Maintainer: Felix Fietkau <nbd@openwrt.org>
+Architecture: ar71xx
+Installed-Size: 5803
+Description:  Ralink Drivers for RT2x00 cards (USB)

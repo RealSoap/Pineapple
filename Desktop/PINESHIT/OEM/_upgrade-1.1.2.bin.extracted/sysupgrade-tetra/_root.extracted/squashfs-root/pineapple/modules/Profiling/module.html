@@ -1,0 +1,199 @@
+<div ng-controller="profilingController">
+    <div class="row">
+        <div class="col-md-3">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Profiling Controls</h3>
+                </div>
+                <div class="panel-body">
+                    <button class="btn btn-default" ng-hide="running" ng-disabled="throbber || ssidList.length == 0 && bssidList.length == 0"
+                            ng-click="startProfiling()">Start Profiling
+                    </button>
+                    <button class="btn btn-default" ng-show="running" ng-disabled="throbber" ng-click="stopProfiling()">
+                        Stop Profiling
+                    </button>
+                    <img src="/img/throbber.gif" ng-show="throbber">
+                    <p>
+                    <div class="well-sm alert-danger" ng-show="ssidList.length == 0 && bssidList.length == 0">
+                        You must have at least one item in a filter.
+                    </div>
+                    </p>
+                    <hr>
+                    <div class="input-group" ng-hide="profiles.length == 0">
+                        <select class="form-control" ng-model="selectedProfile">
+                            <option ng-repeat="profile in profiles">{{profile}}</option>
+                        </select>
+                        <span class="input-group-btn"><button class="btn btn-default"
+                                                              ng-click="loadProfile()">Load</button></span>
+                    </div>
+                    <div class="text-center" ng-show="profiles.length == 0">No stored results</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        BSSID Filters
+                        <span class="dropdown">
+                            <ul class="dropdown-menu" aria-labelledby="clearBSSIDs">
+                                <li ng-click="clearBSSIDs()" ng-disabled="running"><a>Clear all</a></li>
+                            </ul>
+                            <button class="btn btn-xs btn-default dropdown-toggle" type="button" id="clearBSSIDs"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="caret"></span>
+                        </button>
+                    </span>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                    <textarea class="form-control" rows="10" onmouseup="getBSSIDLineNumber(this);"
+                              ng-model="bssidList" readonly></textarea>
+                    </p>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Accesspoint BSSID" name="bssid"
+                               ng-model="bssid" ng-disabled="running">
+                        <span class="input-group-btn">
+                        <button class="btn btn-default" type="button" ng-click="addBSSID()"
+                                ng-disabled="running">Add</button>
+                        <button class="btn btn-default" type="button" ng-click="removeBSSID()"
+                                ng-disabled="running">Remove</button>
+                    </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        SSID Filters
+                        <span class="dropdown">
+                            <ul class="dropdown-menu" aria-labelledby="clearSSIDs">
+                                <li ng-click="clearSSIDs()"><a>Clear all</a></li>
+                            </ul>
+                            <button class="btn btn-xs btn-default dropdown-toggle" type="button" id="clearSSIDs"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="caret"></span>
+                            </button>
+                        </span>
+                    </h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                <textarea class="form-control" rows="10" onmouseup="getSSIDLineNumber(this);"
+                          ng-model="ssidList" readonly></textarea>
+                    </p>
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Accesspoint SSID" name="ssid"
+                               ng-model="ssid" ng-disabled="running">
+                        <span class="input-group-btn">
+                    <button class="btn btn-default" type="button" ng-click="addSSID()"
+                            ng-disabled="running">Add</button>
+                    <button class="btn btn-default" type="button" ng-click="removeSSID()"
+                            ng-disabled="running">Remove</button>
+                </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Results
+                        <span class="dropdown" ng-if="loadedProfile.name">
+                            <ul class="dropdown-menu" aria-labelledby="apDropdown">
+                                <li ng-if="loadedProfile.accessPoints.length != 0" ng-click="addAll()"><a>Add all profiling data to pool and filters</a></li>
+                                <li ng-if="loadedProfile.accessPoints.length != 0" ng-click="addSSIDToPool()"><a>Add all AP SSIDs to PineAP Pool</a></li>
+                                <li ng-if="loadedProfile.accessPoints.length != 0" ng-click="addSSIDToFilter()"><a>Add all AP SSIDs to PineAP Filters</a></li>
+                                <li ng-if="loadedProfile.accessPoints.length != 0" ng-click="addClientProbesToPool()"><a>Add all Client Probes to PineAP Pool</a></li>
+                                <li ng-if="loadedProfile.accessPoints.length != 0" ng-click="addClientsToFilter()"><a>Add all Client BSSIDs to PineAP Filters</a></li>
+                                <li ng-if="loadedProfile.accessPoints.length != 0" ng-click="addClientProbesToFilter()"><a>Add all Client Probes to PineAP Filters</a></li>
+                                <li ng-click="deleteProfile()"><a>Delete Results</a></li>
+                            </ul>
+                            <button class="btn btn-xs btn-default dropdown-toggle" type="button" id="apDropdown"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="caret"></span>
+                            </button>
+                            <img ng-show="working" src="/img/throbber.gif" height="20px">
+                        </span>
+                    </h3>
+                </div>
+                <div class="table-responsive" ng-hide="loadedProfile.accessPoints.length == 0">
+                    <table class="table">
+                        <tr>
+                            <th>SSID</th>
+                            <th>MAC</th>
+                            <th>Security</th>
+                            <th>WPS</th>
+                            <th>Channel</th>
+                            <th>Signal</th>
+                        </tr>
+                        <tr ng-repeat-start="accessPoint in loadedProfile.accessPoints">
+                            <td><span class="text-info" ng-hide="accessPoint.ssid"><i>Hidden</i></span>{{accessPoint.ssid}}
+                            </td>
+                            <td>{{accessPoint.bssid}}</td>
+                            <td>{{accessPoint.encryption}}</td>
+                            <td>{{accessPoint.wps == 1 ? "yes" : "no"}}</td>
+                            <td>{{accessPoint.channel}}</td>
+                            <td>{{accessPoint.power}}</td>
+                        </tr>
+                        <tr ng-repeat="(client, probes) in accessPoint.clients" ng-repeat-end class="active">
+                            <td></td>
+                            <td>{{client}}</td>
+                            <td colspan="4">{{concatProbes(probes)}}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="panel-body" ng-hide="loadedProfile.name">
+                    No profile loaded.
+                </div>
+                <div class="panel-body" ng-if="loadedProfile.name && loadedProfile.accessPoints.length == 0">
+                    No data collected in loaded profile.
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" ng-if="keys(loadedProfile.unassociatedClients).length != 0">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">
+                        Unassociated Clients
+                        <span class="dropdown">
+                            <ul class="dropdown-menu" aria-labelledby="clientDropdown">
+                                <li ng-click="addAllUnassociated()"><a>Add all profiling data to pool and filters</a></li>
+                                <li ng-click="addUnassociatedProbesToPool()"><a>Add all unassociated Probes to PineAP Pool</a></li>
+                                <li ng-click="addUnassociatedProbesToFilter()"><a>Add all unassociated Probes to PineAP Filter</a></li>
+                                <li ng-click="addUnassociatedClientsToFilter()"><a>Add all unassociated Clients to PineAP Filter</a></li>
+                            </ul>
+                            <button class="btn btn-xs btn-default dropdown-toggle" type="button" id="clientDropdown"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="caret"></span>
+                            </button>
+                            <img ng-show="unassociatedWorking" src="/img/throbber.gif" height="20px">
+                        </span>
+                    </h3>
+                </div>
+                <div class="table-responsive">
+                    <table class="table">
+                        <tr>
+                            <th>MAC</th>
+                            <th>Probes</th>
+                        </tr>
+                        <tr ng-repeat="(bssid, probes) in loadedProfile.unassociatedClients">
+                            <td>{{bssid}}</td>
+                            <td>{{concatProbes(probes)}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

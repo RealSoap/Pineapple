@@ -1,0 +1,27 @@
+/etc/init.d/sshd disable
+/etc/init.d/sshd stop
+
+# Enable both WiFi interfaces
+wifi detect > /etc/config/wireless
+wifi
+
+# Enable fstab and mount
+/etc/init.d/fstab enable
+block mount
+
+# Touch known hosts
+mkdir -p /root/.ssh/
+touch /root/.ssh/known_hosts
+
+echo "export PATH=/usr/bin/pineapple:/bin:/sbin:/usr/bin:/usr/sbin" >> /etc/profile
+
+# Make SSH banner have the correct version
+version=$(cat /etc/pineapple/pineapple_version | head -c 5)
+eval "sed -i s/VERSION/$version/g /etc/banner"
+eval "sed -i s/VERSION/$version/g /etc/banner.failsafe"
+
+rm -rf /etc/pineapple/init
+
+echo -e "\n# Enter commands above this line\nexit 0" > /etc/rc.local
+
+exit 0

@@ -1,0 +1,10 @@
+Package: kmod-usb-net-rndis
+Version: 3.18.36-1
+Depends: kernel (=3.18.36-1-871fa9a3e0f1cc470d440bd876b3c8aa), kmod-usb-net, kmod-usb-net-cdc-ether
+Source: package/kernel/linux
+License: GPLv2
+Section: kernel
+Status: unknown hold not-installed
+Architecture: ar71xx
+Installed-Size: 4349
+Description:  Kernel support for RNDIS connections
